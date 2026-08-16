@@ -1,0 +1,399 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="educational_6dof_arm_gazebo">
+  <xacro:arg name="controllers_file" default=""/>
+
+  <xacro:macro name="box_inertial" params="mass x y z ox:=0 oy:=0 oz:=0">
+    <inertial>
+      <origin xyz="${ox} ${oy} ${oz}" rpy="0 0 0"/>
+      <mass value="${mass}"/>
+      <inertia
+        ixx="${mass * (y * y + z * z) / 12.0}"
+        ixy="0" ixz="0"
+        iyy="${mass * (x * x + z * z) / 12.0}"
+        iyz="0"
+        izz="${mass * (x * x + y * y) / 12.0}"/>
+    </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="cylinder_inertial" params="mass radius length ox:=0 oy:=0 oz:=0">
+    <inertial>
+      <origin xyz="${ox} ${oy} ${oz}" rpy="0 0 0"/>
+      <mass value="${mass}"/>
+      <inertia
+        ixx="${mass * (3.0 * radius * radius + length * length) / 12.0}"
+        ixy="0" ixz="0"
+        iyy="${mass * (3.0 * radius * radius + length * length) / 12.0}"
+        iyz="0"
+        izz="${mass * radius * radius / 2.0}"/>
+    </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="detachable_cube" params="color">
+    <gazebo>
+      <plugin filename="gz-sim-detachable-joint-system" name="gz::sim::systems::DetachableJoint">
+        <parent_link>gripper_base</parent_link>
+        <child_model>${color}_cube</child_model>
+        <child_link>cube_link</child_link>
+        <attach_topic>/grasp/${color}/attach</attach_topic>
+        <detach_topic>/grasp/${color}/detach</detach_topic>
+        <output_topic>/grasp/${color}/status</output_topic>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+  <material name="graphite"><color rgba="0.08 0.10 0.12 1"/></material>
+  <material name="industrial_blue"><color rgba="0.10 0.52 0.78 1"/></material>
+  <material name="industrial_blue_light"><color rgba="0.28 0.68 0.90 1"/></material>
+  <material name="machined_metal"><color rgba="0.68 0.72 0.75 1"/></material>
+  <material name="joint_black"><color rgba="0.035 0.045 0.055 1"/></material>
+  <material name="rubber"><color rgba="0.025 0.03 0.035 1"/></material>
+
+  <link name="world"/>
+
+  <link name="base_link">
+    <xacro:cylinder_inertial mass="5.0" radius="0.11" length="0.08" oz="0.04"/>
+    <visual>
+      <origin xyz="0 0 0.04" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.11" length="0.08"/></geometry>
+      <material name="graphite"/>
+    </visual>
+    <visual>
+      <origin xyz="0 0 0.078" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.092" length="0.018"/></geometry>
+      <material name="machined_metal"/>
+    </visual>
+    <visual>
+      <origin xyz="0 0 0.089" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.078" length="0.010"/></geometry>
+      <material name="industrial_blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.04" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.11" length="0.08"/></geometry>
+    </collision>
+  </link>
+  <joint name="world_to_base" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+  </joint>
+
+  <link name="joint_1_rotor">
+    <xacro:cylinder_inertial mass="1.4" radius="0.055" length="0.18" oz="-0.09"/>
+    <visual>
+      <origin xyz="0 0 -0.09" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.055" length="0.18"/></geometry>
+      <material name="industrial_blue"/>
+    </visual>
+    <visual>
+      <geometry><cylinder radius="0.074" length="0.072"/></geometry>
+      <material name="graphite"/>
+    </visual>
+    <visual>
+      <origin xyz="0 0 0.039" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.061" length="0.008"/></geometry>
+      <material name="joint_black"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.09" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.055" length="0.18"/></geometry>
+    </collision>
+  </link>
+  <joint name="joint_1" type="revolute">
+    <parent link="base_link"/><child link="joint_1_rotor"/>
+    <origin xyz="0 0 0.18" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.141592653589793" upper="3.141592653589793" effort="80" velocity="1.5"/>
+    <dynamics damping="0.8" friction="0.1"/>
+  </joint>
+
+  <link name="link_1"/>
+  <joint name="joint_1_dh_fixed" type="fixed">
+    <parent link="joint_1_rotor"/><child link="link_1"/>
+    <origin xyz="0 0 0" rpy="1.5707963267948966 0 0"/>
+  </joint>
+
+  <link name="joint_2_rotor">
+    <xacro:box_inertial mass="2.0" x="0.32" y="0.055" z="0.055" ox="0.16"/>
+    <visual>
+      <origin xyz="0.16 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.32 0.055 0.055"/></geometry>
+      <material name="industrial_blue"/>
+    </visual>
+    <visual>
+      <origin xyz="0.16 0 0.030" rpy="0 1.57079632679 0"/>
+      <geometry><cylinder radius="0.038" length="0.25"/></geometry>
+      <material name="industrial_blue_light"/>
+    </visual>
+    <visual><geometry><cylinder radius="0.067" length="0.070"/></geometry><material name="joint_black"/></visual>
+    <visual><origin xyz="0.055 -0.048 0" rpy="0 0 0"/><geometry><box size="0.10 0.045 0.09"/></geometry><material name="joint_black"/></visual>
+    <collision>
+      <origin xyz="0.16 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.32 0.055 0.055"/></geometry>
+    </collision>
+  </link>
+  <joint name="joint_2" type="revolute">
+    <parent link="link_1"/><child link="joint_2_rotor"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.35" upper="2.35" effort="80" velocity="1.5"/>
+    <dynamics damping="0.8" friction="0.1"/>
+  </joint>
+
+  <link name="link_2"/>
+  <joint name="joint_2_dh_fixed" type="fixed">
+    <parent link="joint_2_rotor"/><child link="link_2"/>
+    <origin xyz="0.32 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="joint_3_rotor">
+    <xacro:box_inertial mass="1.6" x="0.28" y="0.05" z="0.05" ox="0.14"/>
+    <visual>
+      <origin xyz="0.14 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.28 0.05 0.05"/></geometry>
+      <material name="industrial_blue"/>
+    </visual>
+    <visual>
+      <origin xyz="0.14 0 0.027" rpy="0 1.57079632679 0"/>
+      <geometry><cylinder radius="0.034" length="0.21"/></geometry>
+      <material name="industrial_blue_light"/>
+    </visual>
+    <visual><geometry><cylinder radius="0.060" length="0.064"/></geometry><material name="joint_black"/></visual>
+    <visual><origin xyz="0.045 -0.044 0" rpy="0 0 0"/><geometry><box size="0.085 0.040 0.078"/></geometry><material name="joint_black"/></visual>
+    <collision>
+      <origin xyz="0.14 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.28 0.05 0.05"/></geometry>
+    </collision>
+  </link>
+  <joint name="joint_3" type="revolute">
+    <parent link="link_2"/><child link="joint_3_rotor"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.35" upper="2.35" effort="65" velocity="1.5"/>
+    <dynamics damping="0.7" friction="0.08"/>
+  </joint>
+
+  <link name="link_3">
+    <xacro:cylinder_inertial mass="0.9" radius="0.038" length="0.22" oz="0.11"/>
+    <visual>
+      <origin xyz="0 0 0.11" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.038" length="0.22"/></geometry>
+      <material name="industrial_blue"/>
+    </visual>
+    <visual>
+      <origin xyz="0 0 0.11" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.028" length="0.19"/></geometry>
+      <material name="industrial_blue_light"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.11" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.038" length="0.22"/></geometry>
+    </collision>
+  </link>
+  <joint name="joint_3_dh_fixed" type="fixed">
+    <parent link="joint_3_rotor"/><child link="link_3"/>
+    <origin xyz="0.28 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="joint_4_rotor">
+    <xacro:cylinder_inertial mass="0.55" radius="0.058" length="0.07"/>
+    <visual><geometry><sphere radius="0.058"/></geometry><material name="industrial_blue"/></visual>
+    <visual><geometry><cylinder radius="0.047" length="0.068"/></geometry><material name="joint_black"/></visual>
+    <collision><geometry><sphere radius="0.058"/></geometry></collision>
+  </link>
+  <joint name="joint_4" type="revolute">
+    <parent link="link_3"/><child link="joint_4_rotor"/>
+    <origin xyz="0 0 0.22" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.141592653589793" upper="3.141592653589793" effort="40" velocity="2.0"/>
+    <dynamics damping="0.45" friction="0.05"/>
+  </joint>
+
+  <link name="link_4"/>
+  <joint name="joint_4_dh_fixed" type="fixed">
+    <parent link="joint_4_rotor"/><child link="link_4"/>
+    <origin xyz="0 0 0" rpy="1.5707963267948966 0 0"/>
+  </joint>
+
+  <link name="joint_5_rotor">
+    <xacro:cylinder_inertial mass="0.4" radius="0.05" length="0.075"/>
+    <visual><geometry><cylinder radius="0.05" length="0.075"/></geometry><material name="industrial_blue"/></visual>
+    <visual><origin xyz="0 0 0.040" rpy="0 0 0"/><geometry><cylinder radius="0.041" length="0.010"/></geometry><material name="joint_black"/></visual>
+    <collision><geometry><cylinder radius="0.05" length="0.075"/></geometry></collision>
+  </link>
+  <joint name="joint_5" type="revolute">
+    <parent link="link_4"/><child link="joint_5_rotor"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.50" upper="2.50" effort="30" velocity="2.0"/>
+    <dynamics damping="0.35" friction="0.04"/>
+  </joint>
+
+  <link name="link_5">
+    <xacro:cylinder_inertial mass="0.3" radius="0.032" length="0.10" oz="0.05"/>
+    <visual>
+      <origin xyz="0 0 0.05" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.032" length="0.10"/></geometry>
+      <material name="industrial_blue_light"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.05" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.032" length="0.10"/></geometry>
+    </collision>
+  </link>
+  <joint name="joint_5_dh_fixed" type="fixed">
+    <parent link="joint_5_rotor"/><child link="link_5"/>
+    <origin xyz="0 0 0" rpy="-1.5707963267948966 0 0"/>
+  </joint>
+
+  <link name="joint_6_rotor">
+    <xacro:cylinder_inertial mass="0.25" radius="0.042" length="0.06"/>
+    <visual><geometry><cylinder radius="0.042" length="0.06"/></geometry><material name="industrial_blue"/></visual>
+    <visual><origin xyz="0 0 0.032" rpy="0 0 0"/><geometry><cylinder radius="0.035" length="0.010"/></geometry><material name="joint_black"/></visual>
+    <collision><geometry><cylinder radius="0.042" length="0.06"/></geometry></collision>
+  </link>
+  <joint name="joint_6" type="revolute">
+    <parent link="link_5"/><child link="joint_6_rotor"/>
+    <origin xyz="0 0 0.10" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.141592653589793" upper="3.141592653589793" effort="20" velocity="2.5"/>
+    <dynamics damping="0.25" friction="0.03"/>
+  </joint>
+
+  <link name="tool0"/>
+  <joint name="tool_fixed" type="fixed">
+    <parent link="joint_6_rotor"/><child link="tool0"/>
+  </joint>
+
+  <link name="gripper_base">
+    <xacro:box_inertial mass="0.22" x="0.08" y="0.10" z="0.04" oz="0.02"/>
+    <visual>
+      <origin xyz="0 0 0.02" rpy="0 0 0"/>
+      <geometry><box size="0.08 0.10 0.04"/></geometry>
+      <material name="industrial_blue"/>
+    </visual>
+    <visual>
+      <origin xyz="0 0 0.046" rpy="0 0 0"/>
+      <geometry><box size="0.068 0.086 0.025"/></geometry>
+      <material name="machined_metal"/>
+    </visual>
+    <visual>
+      <origin xyz="0 0.049 0.067" rpy="1.57079632679 0 0"/>
+      <geometry><cylinder radius="0.015" length="0.016"/></geometry>
+      <material name="joint_black"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.02" rpy="0 0 0"/>
+      <geometry><box size="0.08 0.10 0.04"/></geometry>
+    </collision>
+  </link>
+  <joint name="gripper_fixed" type="fixed">
+    <parent link="tool0"/><child link="gripper_base"/>
+  </joint>
+  <gazebo reference="gripper_fixed">
+    <preserveFixedJoint>true</preserveFixedJoint>
+  </gazebo>
+
+  <link name="left_finger">
+    <xacro:box_inertial mass="0.10" x="0.025" y="0.020" z="0.14" oz="0.09"/>
+    <visual>
+      <origin xyz="0 0 0.09" rpy="0 0 0"/>
+      <geometry><box size="0.025 0.020 0.14"/></geometry>
+      <material name="machined_metal"/>
+    </visual>
+    <visual>
+      <origin xyz="0 0.006 0.11" rpy="0 0 0"/>
+      <geometry><box size="0.028 0.008 0.070"/></geometry>
+      <material name="rubber"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.09" rpy="0 0 0"/>
+      <geometry><box size="0.025 0.020 0.14"/></geometry>
+    </collision>
+  </link>
+  <joint name="left_finger_joint" type="prismatic">
+    <parent link="gripper_base"/><child link="left_finger"/>
+    <origin xyz="0 0.025 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="0" upper="0.030" effort="70" velocity="0.08"/>
+    <dynamics damping="1.0" friction="0.2"/>
+  </joint>
+
+  <link name="right_finger">
+    <xacro:box_inertial mass="0.10" x="0.025" y="0.020" z="0.14" oz="0.09"/>
+    <visual>
+      <origin xyz="0 0 0.09" rpy="0 0 0"/>
+      <geometry><box size="0.025 0.020 0.14"/></geometry>
+      <material name="machined_metal"/>
+    </visual>
+    <visual>
+      <origin xyz="0 -0.006 0.11" rpy="0 0 0"/>
+      <geometry><box size="0.028 0.008 0.070"/></geometry>
+      <material name="rubber"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.09" rpy="0 0 0"/>
+      <geometry><box size="0.025 0.020 0.14"/></geometry>
+    </collision>
+  </link>
+  <joint name="right_finger_joint" type="prismatic">
+    <parent link="gripper_base"/><child link="right_finger"/>
+    <origin xyz="0 -0.025 0" rpy="0 0 0"/>
+    <axis xyz="0 -1 0"/>
+    <limit lower="0" upper="0.030" effort="70" velocity="0.08"/>
+    <dynamics damping="1.0" friction="0.2"/>
+  </joint>
+
+  <gazebo reference="left_finger"><mu1>5.0</mu1><mu2>5.0</mu2></gazebo>
+  <gazebo reference="right_finger"><mu1>5.0</mu1><mu2>5.0</mu2></gazebo>
+
+  <xacro:detachable_cube color="white"/>
+  <xacro:detachable_cube color="red"/>
+  <xacro:detachable_cube color="blue"/>
+  <xacro:detachable_cube color="yellow"/>
+  <xacro:detachable_cube color="green"/>
+
+  <ros2_control name="GazeboSimSystem" type="system">
+    <hardware><plugin>gz_ros2_control/GazeboSimSystem</plugin></hardware>
+    <joint name="joint_1">
+      <command_interface name="position"><param name="min">-3.141592653589793</param><param name="max">3.141592653589793</param></command_interface>
+      <state_interface name="position"><param name="initial_value">1.155188</param></state_interface><state_interface name="velocity"/>
+    </joint>
+    <joint name="joint_2">
+      <command_interface name="position"><param name="min">-2.35</param><param name="max">2.35</param></command_interface>
+      <state_interface name="position"><param name="initial_value">0.055495</param></state_interface><state_interface name="velocity"/>
+    </joint>
+    <joint name="joint_3">
+      <command_interface name="position"><param name="min">-2.35</param><param name="max">2.35</param></command_interface>
+      <state_interface name="position"><param name="initial_value">1.157327</param></state_interface><state_interface name="velocity"/>
+    </joint>
+    <joint name="joint_4">
+      <command_interface name="position"><param name="min">-3.141592653589793</param><param name="max">3.141592653589793</param></command_interface>
+      <state_interface name="position"><param name="initial_value">0.357974</param></state_interface><state_interface name="velocity"/>
+    </joint>
+    <joint name="joint_5">
+      <command_interface name="position"><param name="min">-2.50</param><param name="max">2.50</param></command_interface>
+      <state_interface name="position"><param name="initial_value">1.570806</param></state_interface><state_interface name="velocity"/>
+    </joint>
+    <joint name="joint_6">
+      <command_interface name="position"><param name="min">-3.141592653589793</param><param name="max">3.141592653589793</param></command_interface>
+      <state_interface name="position"><param name="initial_value">-0.415632</param></state_interface><state_interface name="velocity"/>
+    </joint>
+    <joint name="left_finger_joint">
+      <command_interface name="position"><param name="min">0</param><param name="max">0.030</param></command_interface>
+      <state_interface name="position"><param name="initial_value">0.025</param></state_interface><state_interface name="velocity"/>
+    </joint>
+    <joint name="right_finger_joint">
+      <command_interface name="position"><param name="min">0</param><param name="max">0.030</param></command_interface>
+      <state_interface name="position"><param name="initial_value">0.025</param></state_interface><state_interface name="velocity"/>
+    </joint>
+  </ros2_control>
+
+  <gazebo>
+    <self_collide>false</self_collide>
+    <plugin filename="libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+      <parameters>$(arg controllers_file)</parameters>
+      <hold_joints>true</hold_joints>
+      <position_proportional_gain>1.0</position_proportional_gain>
+    </plugin>
+  </gazebo>
+</robot>

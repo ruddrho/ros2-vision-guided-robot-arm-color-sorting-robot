@@ -1,0 +1,8 @@
+target,converged,iterations,position_error_m,orientation_error_rad,status
+pre_grasp,1,9,0.000072303,0.000130292,converged
+grasp,1,7,0.000056068,0.000014386,converged
+lift,1,8,0.000083836,0.000072717,converged
+pre_place,1,13,0.000053203,0.000070395,converged
+place,1,7,0.000067842,0.000024681,converged
+retreat,1,8,0.000085653,0.000077958,converged
+home,1,11,0.000067858,0.000078268,converged

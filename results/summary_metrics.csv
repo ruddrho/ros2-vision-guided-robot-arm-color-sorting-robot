@@ -1,0 +1,12 @@
+metric,value,unit
+ik_targets,7,count
+ik_successes,7,count
+mean_ik_iterations,9.000000000,iterations
+maximum_ik_position_error,0.000085653,m
+maximum_ik_orientation_error,0.000130292,rad
+trajectory_duration,17.500000000,s
+trajectory_samples,876,count
+maximum_joint_velocity,0.674919885,rad/s
+maximum_joint_acceleration,0.831226056,rad/s^2
+final_position_error,0.000067858,m
+final_orientation_error,0.000078268,rad

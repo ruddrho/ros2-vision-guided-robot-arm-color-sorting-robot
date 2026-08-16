@@ -1,0 +1,9 @@
+metric,value,unit
+physics_pick_and_place,passed,boolean
+controller_stages_completed,8,count
+horizontal_cube_displacement,0.438754,m
+horizontal_destination_error,0.009810,m
+final_cube_height,0.125000,m
+minimum_displacement_threshold,0.25,m
+maximum_destination_error_threshold,0.08,m
+maximum_height_error_threshold,0.08,m

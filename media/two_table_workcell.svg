@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="620" viewBox="0 0 1100 620">
+  <rect width="1100" height="620" fill="#f8fafc"/>
+  <text x="550" y="44" text-anchor="middle" font-family="Arial" font-size="27" font-weight="700" fill="#0f172a">Two-Table Five-Color Sorting Workcell</text>
+  <text x="550" y="72" text-anchor="middle" font-family="Arial" font-size="15" fill="#475569">Top view · source table · center-mounted robot · color-specific destination slots</text>
+  <g transform="translate(550 350)">
+    <rect x="-390" y="-220" width="780" height="180" rx="16" fill="#334155" stroke="#0f172a" stroke-width="4"/>
+    <rect x="-390" y="40" width="780" height="180" rx="16" fill="#334155" stroke="#0f172a" stroke-width="4"/>
+    <text x="-340" y="-175" font-family="Arial" font-size="20" font-weight="700" fill="#ffffff">SOURCE TABLE</text>
+    <text x="-340" y="85" font-family="Arial" font-size="20" font-weight="700" fill="#ffffff">DESTINATION TABLE</text>
+    <circle cx="0" cy="0" r="72" fill="#1693cf" stroke="#082f49" stroke-width="6"/>
+    <circle cx="0" cy="0" r="42" fill="#111827"/>
+    <text x="0" y="7" text-anchor="middle" font-family="Arial" font-size="17" font-weight="700" fill="#ffffff">6-DOF</text>
+    <text x="0" y="28" text-anchor="middle" font-family="Arial" font-size="13" fill="#bae6fd">ROBOT</text>
+    <g stroke="#e2e8f0" stroke-width="3">
+      <circle cx="-260" cy="-115" r="23" fill="#ffffff"/><circle cx="-130" cy="-115" r="23" fill="#ef4444"/>
+      <circle cx="0" cy="-115" r="23" fill="#2563eb"/><circle cx="130" cy="-115" r="23" fill="#facc15"/>
+      <circle cx="260" cy="-115" r="23" fill="#22c55e"/>
+    </g>
+    <g fill="none" stroke-width="6" stroke-dasharray="9 7">
+      <circle cx="-260" cy="115" r="27" stroke="#ffffff"/><circle cx="-130" cy="115" r="27" stroke="#ef4444"/>
+      <circle cx="0" cy="115" r="27" stroke="#2563eb"/><circle cx="130" cy="115" r="27" stroke="#facc15"/>
+      <circle cx="260" cy="115" r="27" stroke="#22c55e"/>
+    </g>
+    <path d="M0 -75 C0 -95 0 -95 0 -90" fill="none" stroke="#0ea5e9" stroke-width="5"/>
+    <path d="M0 75 C0 95 0 95 0 90" fill="none" stroke="#0ea5e9" stroke-width="5"/>
+  </g>
+  <g font-family="Arial" font-size="14" fill="#334155" text-anchor="middle">
+    <text x="290" y="255">white</text><text x="420" y="255">red</text><text x="550" y="255">blue</text><text x="680" y="255">yellow</text><text x="810" y="255">green</text>
+    <text x="550" y="596">Command order is arbitrary; every color is assigned to its matching destination marker.</text>
+  </g>
+</svg>
