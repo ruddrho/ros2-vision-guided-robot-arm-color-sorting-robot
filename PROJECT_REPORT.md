@@ -1,6 +1,6 @@
 # Project Report
 
-## C++ Vision-Guided 6-DOF Robot Arm: OpenCV Color Sorting and Pick-and-Place
+## A ROS 2 Vision-Guided Pick-and-Place Robotic Arm: OpenCV Five-Color Sorting in Gazebo
 
 ## 1. Abstract
 
@@ -11,17 +11,19 @@ analytical geometric Jacobian, damped least-squares inverse kinematics, joint
 limits, quintic interpolation, automated numerical tests, and a multi-stage
 pick-and-place demonstration.
 
-The mathematical core uses no third-party runtime library. An optional ROS 2
-Jazzy layer adds an `rclcpp` trajectory player, a matching URDF model, live
-joint-state and end-effector topics, and RViz visualization. Numerical results
+The mathematical core can also run as a standalone C++17 implementation.
+The current system integrates this core with ROS 2 Jazzy for trajectory
+execution, controller interfaces, OpenCV-based perception, Gazebo simulation,
+live joint-state and end-effector topics, and RViz visualization. Numerical results
 are exported to CSV, and trajectory plots are generated directly as SVG. In
 the verified standalone demonstration, all seven inverse-kinematics targets
 converged and all five automated tests passed.
 
-Version 2.0 adds a Gazebo Harmonic experiment in which a two-finger gripper
-must transport a dynamic cube through simulated contact and friction. The
-experiment measures the final cube pose and publishes an explicit pass/fail
-result rather than treating successful arm motion as successful manipulation.
+Version 2.0 introduced the project's early single-cube Gazebo manipulation
+prototype, where a two-finger gripper transported one dynamic cube through
+simulated contact and friction. This early stage established explicit pose-based
+success verification before the system was extended to multi-color vision-guided
+sorting in later versions.
 
 Version 3.0 extends the experiment into a command-driven perception and
 manipulation system. An overhead RGB camera observes five colored cubes,
@@ -171,7 +173,7 @@ Multiple segments are concatenated without duplicating boundary samples.
 Forward kinematics are evaluated at every trajectory sample to export the
 end-effector path.
 
-## 10. Pick-and-place experiment
+## 10. Standalone Kinematics Pick-and-Place Demonstration
 
 The experiment includes home, pre-grasp, grasp, lift, pre-place, place,
 retreat, and final home configurations. Target poses are produced from known
@@ -202,7 +204,7 @@ The verified build used GCC 13.3 with C++17 and the flags:
 
 The compilation completed without warnings, and all tests passed.
 
-## 12. Results
+## 12. Standalone Numerical Results
 
 | Metric | Result |
 | --- | ---: |
@@ -258,60 +260,69 @@ development environment. The ROS 2 package build, package test, RViz playback,
 controller startup, and Gazebo physics experiment were also executed on ROS 2
 Jazzy. Gazebo Sim 8.11.0 loaded the model and completed the commanded task.
 
-## 15. Gazebo Harmonic physics experiment
+## 15. Gazebo Five-Color Pick-and-Place Experiment
 
 The Gazebo model extends the kinematic chain with collision geometry, link
 mass and inertia, joint damping, actuator limits, and two independently
-controlled prismatic fingers. A dynamic cube begins on the pickup pedestal,
-while a second pedestal marks the destination.
+controlled prismatic fingers. The workcell contains two side-by-side tables,
+five colored source cubes, and five corresponding destination markers for
+white, red, blue, yellow, and green. The 6-DOF robot is mounted between the
+two work areas and performs command-driven pick-and-place operations for the
+selected color.
 
 `gz_ros2_control` connects the Gazebo joints to a ROS 2 controller manager.
 Independent trajectory controllers command the six revolute arm joints and
 the two gripper joints through separate `FollowJointTrajectory` actions. The
-coordinator sends
-the following phases:
+ coordinator executes the following sequence for the selected color:
 
-1. pickup pre-grasp
-2. pickup descent
-3. gripper closure
-4. vertical lift
-5. transfer above the destination
-6. placement descent
-7. gripper opening
-8. retreat
+1. color-specific source approach
+2. move to pickup pre-grasp
+3. descend to the selected cube
+4. activate the simulated DetachableJoint grasp
+5. close the gripper
+6. lift the cube and verify grasp retention
+7. follow the color-specific high-transfer profile
+8. move above the matching destination
+9. align the wrist for placement
+10. lower the cube to the destination
+11. detach the simulated grasp
+12. open the gripper
+13. retreat from the destination
+14. return to the safe home configuration
+15. verify the final cube position
 
-The cube is not attached to the tool with a hidden fixed joint. Transport
-therefore depends on collision response and friction between the cube and the
-two fingers. A Gazebo pose publisher and ROS-Gazebo bridge provide the cube
-pose to the coordinator.
+The selected cube is stabilized in simulation using Gazebo's DetachableJoint
+after the robot reaches the calibrated grasp pose and immediately before the
+gripper closes. The joint remains active during transport and is detached at
+the matching destination before the gripper opens. A Gazebo pose publisher
+and ROS-Gazebo bridge provide cube-pose feedback to the coordinator for grasp,
+lift, and final-placement verification.
 
 The acceptance conditions are:
 
 | Criterion | Threshold |
 | --- | ---: |
-| Minimum horizontal cube displacement | 0.25 m |
-| Maximum horizontal destination error | 0.08 m |
-| Maximum final height error | 0.08 m |
-| Required controller stages | All stages succeed |
+| Minimum horizontal cube displacement | > 0.20 m |
+| Maximum horizontal destination error | < 0.08 m |
+| Maximum final height error | < 0.08 m |
+| Minimum vertical rise during grasp verification | > 0.045 m |
+| Maximum lateral motion during lift verification | < 0.10 m |
+| Controller requirement | All commanded stages succeed |
 
-The runtime experiment completed all eight controller stages. The automatic
-verifier reported:
+The final Version 5 workflow was manually verified in ROS 2 Jazzy and Gazebo
+Harmonic using the five supported colors: white, red, blue, yellow, and green.
+For each selected cube, the coordinator performs grasp stabilization, lift
+verification, color-specific transfer, destination release, return-home motion,
+and final destination-pose verification before publishing a successful result.
 
-| Runtime metric | Measured result |
-| --- | ---: |
-| Controller stages | 8/8 completed |
-| Horizontal cube displacement | 0.438754 m |
-| Horizontal destination error | 0.009810 m |
-| Final cube height | 0.125000 m |
-| Physics pick-and-place result | Passed |
+A controlled repeated-trial, color-by-color statistical evaluation has not yet
+been performed, so no aggregate five-color success rate is claimed here.
 
 ![Verified five-color Gazebo pick-and-place workcell](media/vision_guided_color_sorting_workcell.png)
 
-The measured destination error is below the `0.08 m` acceptance threshold,
-and the displacement exceeds the required `0.25 m`. The result confirms this
-configured simulation trial; it is not a physical-hardware accuracy claim.
 
 ## 16. Version 3 vision-guided multi-color experiment
+The coordinates in this section document the historical Version 3 calibration and are not the active Version 5 workcell coordinates.
 
 The v3 workcell contains five 40 mm dynamic cubes in calibrated pickup slots:
 
@@ -353,16 +364,17 @@ pose is checked for displacement, destination error, and final height.
 | Grasp retention after lift | Minimum 0.045 m vertical rise |
 | Controller requirement | All arm and gripper stages succeed |
 
-The v2 single-cube baseline metrics in Section 15 remain the archived
-quantitative Gazebo evidence. A v3 blue trial verified camera transport,
-five-color annotation, command reception, blue contour selection, and the
-complete arm trajectory, but exposed an over-permissive gripper tolerance.
-Later revisions separated the controllers, tightened the tolerance, and added
-DetachableJoint stabilization and pose-based verification. The final workflow
-has been exercised manually in ROS 2 Jazzy, but no repeated-trial,
-color-by-color success rate is claimed in this report.
+The Version 3 experiment provided the historical multi-color perception and
+manipulation baseline. A blue-cube trial verified camera transport, five-color
+annotation, command reception, contour selection, and the complete arm
+trajectory, while also exposing an over-permissive gripper tolerance. Later
+revisions separated the controllers, tightened the tolerance, and added
+DetachableJoint stabilization and pose-based verification. The final Version 5
+workflow has been manually exercised in ROS 2 Jazzy and Gazebo Harmonic across
+the five supported colors, but no controlled repeated-trial, color-by-color
+success rate is claimed in this report.
 
-## 17. Version 4 two-table color-sorting cell
+## 17. Evolution of the Two-Table Five-Color Workcell
 
 Version 4 places the arm between two identical `0.44 m x 0.44 m` tables. The
 negative-y table contains five colored cubes on a reachable arc; the positive-y
@@ -405,21 +417,14 @@ single manual demonstration.
 
 ## 18. Scope and limitations
 
-- The standalone planner covers kinematics and trajectory generation but not
-  torque-level dynamics.
-- Gazebo includes educational mass, inertia, gravity, friction, collision, and
-  actuator models that are not calibrated to a physical manipulator.
-- The Gazebo scene detects collision, but the planner itself is not
-  collision-aware.
+- The standalone planner covers kinematics and trajectory generation but not torque-level dynamics.
+- Gazebo uses educational mass, inertia, damping, friction, collision, gravity, and actuator parameters that are not calibrated to a physical manipulator.
+- The Gazebo scene detects collisions, but the planner itself is not collision-aware.
 - The target set is generated from known reachable configurations.
 - Singularity and manipulability metrics are not reported.
-- Gazebo dynamics use educational mass, inertia, damping, and friction values.
-- DetachableJoint provides simulator-specific object retention; it does not
-  evaluate physical grasp robustness under randomized properties or disturbances.
-- Collision-aware planning and hardware interfaces are not present.
-- The model is educational and not calibrated to a physical robot.
-- Vision uses calibrated slots and does not estimate arbitrary object depth or
-  orientation.
+- DetachableJoint provides simulator-specific object retention and does not evaluate physical grasp robustness under randomized properties or disturbances.
+- Hardware interfaces and physical-robot validation are not included.
+- Vision uses calibrated slots and does not estimate arbitrary object depth or orientation.
 - HSV thresholds are configured for the supplied Gazebo lighting and materials.
 - Pickup targeting assumes cubes begin in the calibrated supplied slots.
 
@@ -435,7 +440,7 @@ single manual demonstration.
 8. Evaluate random reachable and unreachable targets statistically.
 9. Calibrate camera intrinsics and extrinsics for pixel-to-plane projection.
 10. Evaluate all colors across randomized placements and lighting conditions.
-11. Add repeated sorting into separate destination bins.
+11. Support repeated objects per color and multi-object destination bins.
 12. Validate the implementation on a physical manipulator.
 
 ## 20. License
