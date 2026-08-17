@@ -384,7 +384,8 @@ experimental work.
 
 Version 4.1 restricts segmentation to the source-table image region and uses
 Gazebo's DetachableJoint system to stabilize the selected object after the
-parallel fingers close. The color-specific joint is detached at the matching
+robot reaches the calibrated grasp pose and immediately before the parallel
+fingers close. The color-specific joint is detached at the matching
 destination before the gripper opens. This addresses the observed limitation
 of ideal position interfaces passing through contact without producing a
 stable frictional grasp. It remains a simulator-specific grasp abstraction and
