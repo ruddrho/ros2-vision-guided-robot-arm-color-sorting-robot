@@ -25,7 +25,9 @@ and validation criteria instead of presenting the system as a black box.
 
 ![System architecture](media/project_architecture.svg)
 
+![Two-table workcell](media/two_table_workcell_fixed.png)
 
+*Top-view workcell layout showing the source table, destination table, and the robot mounted between the two work areas. Color order on both tables: white, red, blue, yellow, and green.*
 
 ## Why this project matters
 
