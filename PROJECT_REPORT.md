@@ -272,9 +272,7 @@ selected color.
 
 `gz_ros2_control` connects the Gazebo joints to a ROS 2 controller manager.
 Independent trajectory controllers command the six revolute arm joints and
-the two gripper joints through separate `FollowJointTrajectory` actions. The
- coordinator executes the following sequence for the selected color:
-
+the two gripper joints through separate `FollowJointTrajectory` actions. The coordinator executes the following sequence for the selected color:
 1. color-specific source approach
 2. move to pickup pre-grasp
 3. descend to the selected cube
