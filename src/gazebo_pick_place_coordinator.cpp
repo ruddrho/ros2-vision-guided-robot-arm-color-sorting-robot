@@ -180,7 +180,7 @@ private:
             return false;
         }
         auto resultFuture = client->async_get_result(goalHandle);
-        const auto timeout = std::chrono::duration<double>(durationSeconds + 10.0);
+        const auto timeout = std::chrono::duration<double>(durationSeconds + 20.0);
         if (resultFuture.wait_for(timeout) != std::future_status::ready) {
             RCLCPP_ERROR(get_logger(), "Timed out executing stage: %s", stage.c_str());
             return false;
