@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.0.1
+
+- Increased the trajectory-result timeout margin from 10 s to 20 s to prevent successful controller goals from being incorrectly classified as timeouts.
+- Updated README repository references and installation paths.
+- Corrected the two-table workcell diagram to match the verified Gazebo layout.
+
 ## 5.0.0
 
 - Retained the stable educational Xacro geometry after evaluating an
