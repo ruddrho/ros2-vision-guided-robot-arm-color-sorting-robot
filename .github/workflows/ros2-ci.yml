@@ -1,0 +1,23 @@
+name: ROS 2 Jazzy CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    container:
+      image: rostooling/setup-ros-docker:ubuntu-noble-latest
+
+    steps:
+      - name: Build and test ROS 2 package
+        uses: ros-tooling/action-ros-ci@v0.4
+        with:
+          package-name: cpp_robot_arm_kinematics
+          target-ros2-distro: jazzy
