@@ -35,6 +35,8 @@ validated C++ color-command utility, corrects Gazebo model-pose selection, and
 adds an explicit post-lift grasp-retention test. This prevents successful arm
 motion from being reported as successful object manipulation.
 
+Version 5 extends the system into a stable two-table, five-color sorting workcell with color-specific source and transfer profiles, improved motion clearance, low destination release, safe return-home behavior, and verified sequential command execution.
+
 ## 2. Objectives
 
 The objectives are:
