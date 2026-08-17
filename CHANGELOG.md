@@ -30,7 +30,10 @@
   blue arm and destination markers cannot be selected as cubes.
 - Increased the gripper contact-pad width and corrected the grasp height.
 - Added one Gazebo DetachableJoint channel per color for reliable simulated
-  grasp retention after finger closure and release at the destination.
+  grasp retention after reaching the calibrated grasp pose and immediately
+  before finger closure, with detachment at the matching destination before
+  the gripper opens.
+  
 - Preserved command-driven, arbitrary-order sorting and repeated-color rejection.
 - Documented grasp stabilization explicitly instead of representing it as
   hardware-equivalent force control.
