@@ -305,7 +305,7 @@ verifier reported:
 | Final cube height | 0.125000 m |
 | Physics pick-and-place result | Passed |
 
-![Verified Gazebo pick-and-place result](media/gazebo_pick_place_result.png)
+![Verified five-color Gazebo pick-and-place workcell](media/vision_guided_color_sorting_workcell.png)
 
 The measured destination error is below the `0.08 m` acceptance threshold,
 and the displacement exceeds the required `0.25 m`. The result confirms this
