@@ -33,7 +33,6 @@
   grasp retention after reaching the calibrated grasp pose and immediately
   before finger closure, with detachment at the matching destination before
   the gripper opens.
-  
 - Preserved command-driven, arbitrary-order sorting and repeated-color rejection.
 - Documented grasp stabilization explicitly instead of representing it as
   hardware-equivalent force control.
