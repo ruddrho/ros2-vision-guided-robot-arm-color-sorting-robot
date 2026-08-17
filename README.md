@@ -58,8 +58,8 @@ control, computer vision, and industrial automation.
 - **Independent gripper control:** separate controller for two prismatic fingers
 - **Color-specific motion:** distinct source-transit, transfer, and placement
   wrist configurations for the five colors
-- **Safe manipulation sequence:** approach, descend, close, lift, transfer,
-  align, lower, release, retreat, and return home
+- **Safe manipulation sequence:** approach, descend, simulated grasp attachment,
+  gripper closure, lift, transfer, align, lower, detach, release, retreat, and return home
 - **Grasp stabilization:** color-specific Gazebo DetachableJoint topics
 - **Verification:** lift confirmation and final cube-pose acceptance checks
 - **Continuous operation:** after a successful cycle, the coordinator returns
@@ -80,7 +80,7 @@ Calibrated source pose publication
     ↓
 Color-specific arm approach and pre-grasp
     ↓
-Gripper closure and simulated grasp attachment
+Simulated grasp attachment, followed by gripper closure
     ↓
 Lift verification
     ↓
@@ -228,7 +228,7 @@ mkdir -p ~/robot_arm_ws/src
 Do not keep another copy of this ROS package anywhere inside
 `~/robot_arm_ws`. Backups should be stored outside the workspace.
 
-### 4. Download the GitHub ZIP from the terminal
+### 4. Download the Repository from GitHub
 
 The following commands assume that the repository is hosted at
 `ruddrho/ros2-vision-guided-robot-arm-color-sorting-robot` on the `main` branch:
@@ -418,134 +418,7 @@ code .
 
 Open two integrated terminal tabs. Use the first for the launch command and the
 second for color commands. The shell commands are identical to the Ubuntu
-terminal commands above.
-
-## Installation from a downloaded release ZIP
-
-### Step 1: Install ROS 2 Jazzy
-
-Install ROS 2 Jazzy Desktop on Ubuntu 24.04 using the official ROS 2
-documentation:
-
-<https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html>
-
-After installation, confirm that the environment exists:
-
-```bash
-test -f /opt/ros/jazzy/setup.bash && echo "ROS 2 Jazzy found"
-```
-
-### Step 2: Install development tools
-
-```bash
-sudo apt update
-sudo apt install -y \
-  build-essential \
-  cmake \
-  unzip \
-  python3-colcon-common-extensions \
-  python3-rosdep
-```
-
-Install the main Gazebo and ROS integration packages:
-
-```bash
-sudo apt install -y \
-  ros-jazzy-ros-gz \
-  ros-jazzy-gz-ros2-control \
-  ros-jazzy-joint-trajectory-controller \
-  ros-jazzy-joint-state-broadcaster \
-  ros-jazzy-rqt-image-view \
-  ros-jazzy-cv-bridge \
-  ros-jazzy-xacro
-```
-
-### Step 3: Initialize rosdep
-
-Run `rosdep init` only if it has not already been initialized:
-
-```bash
-if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then
-  sudo rosdep init
-fi
-rosdep update
-```
-
-### Step 4: Create the ROS 2 workspace
-
-```bash
-mkdir -p ~/robot_arm_ws/src
-```
-
-### Step 5: Extract the project
-
-If the ZIP is in the Ubuntu `~/Downloads` directory:
-
-```bash
-unzip ~/Downloads/cpp-robot-arm-color-sorting-ros2-jazzy-v5-final.zip \
-  -d ~/robot_arm_ws/src
-```
-
-For WSL, when the ZIP is in the Windows Downloads directory:
-
-```bash
-unzip '/mnt/c/Users/YOUR_WINDOWS_USERNAME/Downloads/cpp-robot-arm-color-sorting-ros2-jazzy-v5-final.zip' \
-  -d ~/robot_arm_ws/src
-```
-
-Replace `YOUR_WINDOWS_USERNAME` with the Windows account name.
-
-Verify that exactly one ROS package is present:
-
-```bash
-find ~/robot_arm_ws/src -name package.xml -print
-```
-
-Expected package path:
-
-```text
-~/robot_arm_ws/src/ros2-vision-guided-robot-arm-color-sorting-robot/package.xml
-```
-
-### Step 6: Install package dependencies
-
-```bash
-cd ~/robot_arm_ws
-source /opt/ros/jazzy/setup.bash
-rosdep install --from-paths src --ignore-src -r -y
-```
-
-### Step 7: Build the project
-
-```bash
-cd ~/robot_arm_ws
-source /opt/ros/jazzy/setup.bash
-
-colcon build --symlink-install \
-  --packages-select cpp_robot_arm_kinematics \
-  --cmake-clean-cache
-```
-
-A successful build ends with:
-
-```text
-Summary: 1 package finished
-```
-
-### Step 8: Run the tests
-
-```bash
-cd ~/robot_arm_ws
-source /opt/ros/jazzy/setup.bash
-source install/setup.bash
-
-colcon test --packages-select cpp_robot_arm_kinematics
-colcon test-result --verbose
-```
-
-The CTest target contains five numerical checks covering forward kinematics,
-the analytical Jacobian, inverse kinematics, quintic trajectory boundary
-conditions, and joint-limit clamping.
+terminal commands above
 
 ## Running the project
 
@@ -723,10 +596,11 @@ motion branch to keep the arm clear of the tables and applies different source
 and transfer configurations for each color. A dedicated placement-wrist angle
 provides visible wrist motion before the low release.
 
-The simulation sequence uses a color-specific Gazebo DetachableJoint after the
-gripper reaches the calibrated grasp pose. This mechanism stabilizes the
-simulated cube during transfer. It is explicitly a simulation aid and is not a
-claim of force-controlled physical grasping.
+The simulation sequence activates a color-specific Gazebo DetachableJoint after
+the gripper reaches the calibrated grasp pose and immediately before the fingers
+close. The joint stabilizes the simulated cube during transfer and is detached
+at the matching destination before the gripper opens. This is a simulation aid,
+not a claim of force-controlled physical grasping.
 
 After placement, the coordinator checks:
 
@@ -776,10 +650,9 @@ The supplied CSV artifacts document the standalone C++ kinematics baseline:
 | Maximum joint acceleration | 0.831226056 rad/s² |
 
 These values come from `results/summary_metrics.csv` and
-`results/ik_results.csv`. The Gazebo CSV and screenshot are retained as an
-earlier single-cube physics baseline. They should not be presented as a
-statistical evaluation of the final five-color system.
-
+`results/ik_results.csv` and represent the standalone C++ kinematics baseline.
+Any earlier Gazebo single-cube artifacts are retained only as historical
+development records and do not represent the final five-color system.
 For a new machine or a new code revision, rebuild, rerun the tests, and record a
 fresh Gazebo trial before reporting new performance values.
 
