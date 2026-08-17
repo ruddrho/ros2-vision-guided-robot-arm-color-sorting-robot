@@ -1,5 +1,6 @@
 # A ROS 2 Vision-Guided Pick-and-Place Robotic Arm
 [![ROS 2 Jazzy CI](https://github.com/ruddrho/ros2-vision-guided-robot-arm-color-sorting-robot/actions/workflows/ros2-ci.yml/badge.svg)](https://github.com/ruddrho/ros2-vision-guided-robot-arm-color-sorting-robot/actions/workflows/ros2-ci.yml)
+[![Release](https://img.shields.io/github/v/release/ruddrho/ros2-vision-guided-robot-arm-color-sorting-robot?label=release)](https://github.com/ruddrho/ros2-vision-guided-robot-arm-color-sorting-robot/releases/latest)
 
 ![Vision-guided robotic arm color-sorting workcell](media/vision_guided_color_sorting_workcell.png)
 
