@@ -1,8 +1,8 @@
-# Vision-Guided Five-Color Sorting with a 6-DOF Robot Arm
+# A ROS 2 Vision-Guided Pick-and-Place Robotic Arm
 
 ![Vision-guided robotic arm color-sorting workcell](media/vision_guided_color_sorting_workcell.png)
 
-*Gazebo simulation and OpenCV overhead-camera view for command-driven five-color cube sorting.*
+*Gazebo simulation and OpenCV overhead-camera view for vision-guided, command-driven pick-and-place and five-color cube sorting.*
 
 ## C++17, ROS 2 Jazzy, OpenCV, ros2_control, and Gazebo Harmonic
 
@@ -25,7 +25,7 @@ and validation criteria instead of presenting the system as a black box.
 
 ![System architecture](media/project_architecture.svg)
 
-![Two-table workcell](media/two_table_workcell.svg)
+
 
 ## Why this project matters
 
@@ -124,7 +124,7 @@ Wait for the next command
 ## Repository layout
 
 ```text
-cpp-robot-arm-kinematics-trajectory-planning/
+ros2-vision-guided-robot-arm-color-sorting-robot/
 ├── config/                         Controller and Gazebo GUI configuration
 ├── include/                        Robotics math, IK, model, and planner APIs
 ├── launch/                         Gazebo and RViz launch files
@@ -229,11 +229,11 @@ Do not keep another copy of this ROS package anywhere inside
 ### 4. Download the GitHub ZIP from the terminal
 
 The following commands assume that the repository is hosted at
-`ruddrho/cpp-robot-arm-kinematics-trajectory-planning` on the `main` branch:
+`ruddrho/ros2-vision-guided-robot-arm-color-sorting-robot` on the `main` branch:
 
 ```bash
 GITHUB_USER=ruddrho
-GITHUB_REPO=cpp-robot-arm-kinematics-trajectory-planning
+GITHUB_REPO=ros2-vision-guided-robot-arm-color-sorting-robot
 GITHUB_BRANCH=main
 
 curl -L \
@@ -265,7 +265,7 @@ For a ZIP downloaded through a Windows browser while using WSL, first locate it:
 
 ```bash
 find /mnt/c/Users -maxdepth 3 -type f \
-  -iname 'cpp-robot-arm-kinematics-trajectory-planning*.zip' \
+-iname 'ros2-vision-guided-robot-arm-color-sorting-robot*.zip' \
   -printf '%T@ %p\n' 2>/dev/null \
   | sort -nr \
   | head -n 3
@@ -275,7 +275,7 @@ Then extract the exact path returned by the command:
 
 ```bash
 unzip -q \
-  '/mnt/c/Users/YOUR_WINDOWS_USERNAME/Downloads/cpp-robot-arm-kinematics-trajectory-planning-main.zip' \
+ '/mnt/c/Users/YOUR_WINDOWS_USERNAME/Downloads/ros2-vision-guided-robot-arm-color-sorting-robot-main.zip' \
   -d ~/robot_arm_ws/src
 ```
 
@@ -295,7 +295,7 @@ Confirm the package name and version:
 
 ```bash
 grep -n '<name>\|<version>' \
-  ~/robot_arm_ws/src/cpp-robot-arm-kinematics-trajectory-planning-main/package.xml
+ ~/robot_arm_ws/src/ros2-vision-guided-robot-arm-color-sorting-robot-main/package.xml
 ```
 
 If the extracted directory does not end in `-main`, use the path shown by the
@@ -502,7 +502,7 @@ find ~/robot_arm_ws/src -name package.xml -print
 Expected package path:
 
 ```text
-~/robot_arm_ws/src/cpp-robot-arm-kinematics-trajectory-planning/package.xml
+~/robot_arm_ws/src/ros2-vision-guided-robot-arm-color-sorting-robot/package.xml
 ```
 
 ### Step 6: Install package dependencies
